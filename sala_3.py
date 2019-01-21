@@ -1,53 +1,42 @@
 #!/usr/bin/env python3
 
-#Author: Wanderson Hermirio and Josenildo Simão
-#Site de Consulta: https://sites.google.com/site/ev3python/learn_ev3_python/
-
-#biblioteca principais para o funcionamentos do robô
 from ev3dev.ev3 import * #biblioteca com os comando do robô
 from time import sleep
 
-#variaveis do sensores
+#Variaveis do sensores:
 """
-tipo de sensores: InfraredSensor(), TouchSensor(), UltrasonicSensor(),GyroSensor(), ColorSensor().
+Tipo de sensores: InfraredSensor(), TouchSensor(), UltrasonicSensor(),GyroSensor(), ColorSensor().
 """
 
-#sensor_fre = UltrasonicSensor('in1') #Especifica qual o sensor esta usando
-#sensor_esq = ColorSensor('in2') #Especifica qual o sensor esta usando
-#sensor_dir = ColorSensor('in3') #Especifica qual o sensor esta usando
-
-
-#modo do senso
-#sensor_fre.mode = 'US-DIST-CM'
-
-#variaveis do motor
-"""
-tipo de Motor:  MediumMotor()
-                LargeMotor()
-"""
 us = UltrasonicSensor('in4')
 us.mode = 'US-DIST-CM'
 motor_esq = LargeMotor('outC')
 motor_dir = LargeMotor('outB')
+cor = ColorSensor('in3')
+cor.mode = 'COL-COLOR'
+gy = GyroSensor('in2')
+gy.mode = 'GYRO-ANG'
+L = [gy.value()]
 
-ve_me = 600
-ve_md = 600
-#modo dos sensores e motores
-tempo = 0
-#Run
+def Corregir(Lista):
+    if Lista[0] > gy.value():
+        lado = 'direita'
+        dife = Lista[0] - gy.value()
+        motor_dir.run_to_rel_pos(position_sp=dife, speed_sp=200)
+    elif Lista[0] < gy.value():
+        lado='esquerda'
+        dife = gy.value() - Lista[0]
+        motor_esq.run_to_rel_pos(position_sp=dife, speed_sp=200)
+
+ve = 400
+i = 0
 while True:
-
-    # ande eternamente
-    motor_esq.run_forever(speed_sp=ve_me)
-    motor_dir.run_forever(speed_sp=ve_md)
-    dist = us.value()/10
-    print(dist)
-    if dist <= 15:
-        motor_esq.run_forever(speed_sp=-ve_me)
-        motor_dir.run_forever(speed_sp=-ve_md)
-        sleep(0.5)
-        motor_esq.run_forever(speed_sp=0)
-        motor_dir.run_forever(speed_sp=ve_md)
-        sleep(0.7)
-    tempo += 1
-
+    i += 1
+    if cor.value()==1:
+        print('{} valor: {}'.format(i,gy.value))
+        motor_esq.run_forever(speed_sp=ve)
+        motor_dir.run_forever(speed_sp=ve)
+        dist = us.value()/10
+        print("while: ", cor.value())
+    if cor.value()!=1:
+        Corregir(L)
