@@ -26,19 +26,32 @@ button = Button()
     motor_esq.run_forever(speed_sp=400)
     sleep(2)
     l.append(gy.value())'''
+def parar(tempo):
+    motor_dir.stop()
+    motor_esq.stop()
+    sleep(tempo)
 
-while True:
-    motor_dir.run_forever(speed_sp=400)
-    motor_esq.run_forever(speed_sp=400)
-    sleep(3)
-    ant = gy.value()
+
+girop = 0
+ant1 = gy.value()
+
+while girop<=90:
+    dist=us.value()/10
+    l.append(dist)
     giro = 0
-    while giro <=80:
-        giro=gy.value() - ant
-        print(giro,gy.value(),ant)
+    ant = gy.value()
+    while giro <= 1:
         motor_dir.run_forever(speed_sp=400)
         motor_esq.run_forever(speed_sp=0)
-    motor_dir.stop()
+        # if us.value() < 87:
+        #     motor_dir.run_forever(speed_sp=400)
+        #     motor_esq.run_forever(speed_sp=400)
+        #     sleep(3)
+        sleep(0.1)
+        giro = gy.value() - ant
+    girop = ant1 + gy.value()
+    print("giro ",girop)
+    parar(1)
 
 
-
+print(l)
