@@ -8,26 +8,30 @@ us = UltrasonicSensor('in4')
 us.mode = 'US-DIST-CM'
 motor_esq = LargeMotor('outB')
 motor_dir = LargeMotor('outC')
-cor = ColorSensor('in3')
-cor.mode = 'COL-COLOR'
+#cor = ColorSensor('in3')
+#cor.mode = 'COL-COLOR'
 gy = GyroSensor('in2')
 gy.mode = 'GYRO-ANG'
 button = Button()
 VELOC = 400
+velo=200
+garra = MediumMotor('outD')
+abc = MediumMotor('outA')
+
 
 def andar_frente(v):    #função para andar pra frente; 'v': velocidade
-    motor_dir.run_forever(speed_sp=v)
-    motor_esq.run_forever(speed_sp=v)
+    motor_dir.run_forever(speed_sp=-v)
+    motor_esq.run_forever(speed_sp=-v)
 
 
 def giro_esq(v):    #função girar o brickman para esquerda
-    motor_dir.run_forever(speed_sp=v)
+    motor_dir.run_forever(speed_sp=-v)
     motor_esq.run_forever(speed_sp=0)
 
 
 def giro_dir(v):    #função girar o brickman para direita
     motor_dir.run_forever(speed_sp=0)
-    motor_esq.run_forever(speed_sp=v)
+    motor_esq.run_forever(speed_sp=-v)
 
 def parar(tempo):       #função para parar
     motor_dir.stop()
@@ -35,23 +39,37 @@ def parar(tempo):       #função para parar
     sleep(tempo)
 
 
-def andar_tras(v):    #função para andar pra tras; 'v': velocidade
-    motor_dir.run_forever(speed_sp=-v)
-    motor_esq.run_forever(speed_sp=-v)
+def andar_tras(v):    #função para dá de ré - 'v': velocidade
+    motor_dir.run_forever(speed_sp=v)
+    motor_esq.run_forever(speed_sp=v)
 
+
+def levantar_garra(v):
+    garra.run_forever(speed_sp=-v)
+    sleep(2)
+    garra.stop()
+    
+
+def abaixar_garra(v):
+    garra.run_forever(speed_sp=v)
+    sleep(2)
+    garra.stop()
+    
+    
 l_d = []
 l_a = []
 giroT = 0
 ang_ant = gy.value()
 
-while (giroT < 70):       #loop para mover em 90 Graus
+levantar_garra(VELOC)
+while (giroT < 80):       #loop para mover em 90 Graus
     dist = us.value()/10
     l_d.append(dist)
     giro_i = 0
     ang_i = gy.value()
     while giro_i < 1:    #loop para mover em pequenos graus
-        giro_dir(VELOC)
         sleep(0.1)
+        giro_dir(VELOC)
         giro_i = gy.value() - ang_i   # mudando o referencial do loop interno
     giroT = gy.value() - ang_ant      # mudando o referencial do loop externo
     l_a.append(gy.value())
@@ -72,7 +90,20 @@ ang_ant = gy.value()
 giroT = 0
 while (giroT < volte):
     giro_esq(VELOC)
+    sleep(0.1)
     giroT = ang_ant - gy.value()
+    print(giroT)
 parar(1)
+
+abaixar_garra(VELOC)
+andar_frente(VELOC)
+sleep(4)
+parar(1)
+andar_tras(velo)
+sleep(0.3)
+parar(1)
+levantar_garra(VELOC)
+
+
 
 
