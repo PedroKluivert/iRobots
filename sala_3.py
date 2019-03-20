@@ -1,109 +1,128 @@
 #!/usr/bin/env python3
 
-from ev3dev.ev3 import * #biblioteca com os comando do robô
+from ev3dev.ev3 import *
 from time import sleep
 
-
+gy = GyroSensor('in2')
+gy.mode = 'GYRO-ANG'
+u = gy.units
 us = UltrasonicSensor('in4')
 us.mode = 'US-DIST-CM'
 motor_esq = LargeMotor('outB')
 motor_dir = LargeMotor('outC')
-#cor = ColorSensor('in3')
-#cor.mode = 'COL-COLOR'
-gy = GyroSensor('in2')
-gy.mode = 'GYRO-ANG'
-button = Button()
-VELOC = 400
-velo=200
-garra = MediumMotor('outD')
-abc = MediumMotor('outA')
+motor_med = MediumMotor('outA')
 
+def Andar_tras():
+    motor_dir.run_forever(speed_sp = 500)
+    motor_esq.run_forever(speed_sp = 500)
 
-def andar_frente(v):    #função para andar pra frente; 'v': velocidade
-    motor_dir.run_forever(speed_sp=-v)
-    motor_esq.run_forever(speed_sp=-v)
+def Andar_frente():
+    motor_dir.run_forever(speed_sp = -500)
+    motor_esq.run_forever(speed_sp = -500)
 
+def Girar_esq():
+    motor_dir.run_forever(speed_sp = -500)
+    motor_esq.run_forever(speed_sp = 0)
 
-def giro_esq(v):    #função girar o brickman para esquerda
-    motor_dir.run_forever(speed_sp=-v)
-    motor_esq.run_forever(speed_sp=0)
+def Girar_dir():
+    motor_dir.run_forever(speed_sp = 0)
+    motor_esq.run_forever(speed_sp = -500)
 
-
-def giro_dir(v):    #função girar o brickman para direita
-    motor_dir.run_forever(speed_sp=0)
-    motor_esq.run_forever(speed_sp=-v)
-
-def parar(tempo):       #função para parar
-    motor_dir.stop()
+def Parar():
     motor_esq.stop()
-    sleep(tempo)
+    motor_dir.stop()
 
+def Subir_garra():
+    motor_med.run_forever(speed_sp=250)
 
-def andar_tras(v):    #função para dá de ré - 'v': velocidade
-    motor_dir.run_forever(speed_sp=v)
-    motor_esq.run_forever(speed_sp=v)
+def Descer_garra():
+    motor_med.run_forever(speed_sp=-250)
 
+def Parar_garra():
+    motor_med.stop()
 
-def levantar_garra(v):
-    garra.run_forever(speed_sp=-v)
-    sleep(2)
-    garra.stop()
-    
+def Girar_dir_90():
+    Giro_Total = 0
+    Ang_ant = gy.value()
+    while (Giro_Total < 90):
+        Girar_dir()
+        Giro_Total = gy.value() - Ang_ant
+    Parar()
 
-def abaixar_garra(v):
-    garra.run_forever(speed_sp=v)
-    sleep(2)
-    garra.stop()
-    
-    
-l_d = []
-l_a = []
-giroT = 0
-ang_ant = gy.value()
-
-levantar_garra(VELOC)
-while (giroT < 80):       #loop para mover em 90 Graus
-    dist = us.value()/10
-    l_d.append(dist)
-    giro_i = 0
-    ang_i = gy.value()
-    while giro_i < 1:    #loop para mover em pequenos graus
-        sleep(0.1)
-        giro_dir(VELOC)
-        giro_i = gy.value() - ang_i   # mudando o referencial do loop interno
-    giroT = gy.value() - ang_ant      # mudando o referencial do loop externo
-    l_a.append(gy.value())
-    parar(1)
-
-md = min(l_d)                    # menor distancia
-i_md = l_d.index(md)             # indice da menor distancia
-a_md = l_a[i_md]                 # angulo da menor distancia
-ult_a = l_a[len(l_a)-1]          # ultimo angulo da lista
-volte = ult_a - a_md             # voltar a menor distancia
-
-print('Distancias:\n {}'.format(l_d))
-print('Angulos:\n {}'.format(l_a))
-print('Volte {} graus.'.format(volte))
-
-
-ang_ant = gy.value()
-giroT = 0
-while (giroT < volte):
-    giro_esq(VELOC)
-    sleep(0.1)
-    giroT = ang_ant - gy.value()
-    print(giroT)
-parar(1)
-
-abaixar_garra(VELOC)
-andar_frente(VELOC)
+def Girar_esq_90():
+    Giro_Total = 0
+    Ang_ant = gy.value()
+    while (Giro_Total < 90):
+        Girar_esq()
+        Giro_Total = Ang_ant - gy.value()
+    Parar()
+'''
+Andar_frente()
+sleep(4.5)
+Parar()
+sleep(2)
+Andar_tras()
+sleep(1)
+Parar()
+Subir_garra()
+sleep(1)
+Descer_garra()
+sleep(1)
+motor_med.stop()
+Girar_esq()
+sleep(2)
+Andar_frente()
 sleep(4)
-parar(1)
-andar_tras(velo)
-sleep(0.3)
-parar(1)
-levantar_garra(VELOC)
+motor_dir.run_forever(speed_sp=0)
+motor_esq.run_forever(speed_sp=500)
+sleep(3)
+Andar_tras()
+sleep(1)
+Parar()'''
 
 
-
-
+#Percorrer a sala em "Zigue-Zague"
+for i in range(2):
+    if i==0:
+        Girar_dir_90()
+    distancia = us.value()/10
+    while(distancia > 8):
+        Andar_tras()
+        distancia = us.value()/10
+    Parar()
+    sleep(1)
+    distancia = us.value()/10
+    while(distancia < 82):
+        Andar_frente()
+        distancia = us.value()/10
+    Parar()
+    Andar_tras()
+    sleep(1)
+    Parar()
+    sleep(1)
+    Subir_garra()
+    sleep(1)
+    Girar_esq_90()
+    Girar_esq_90()
+    Andar_tras()
+    sleep(1)
+    Descer_garra()
+    sleep(1)
+    while(distancia < 82):
+        Andar_frente()
+        distancia = us.value()/10
+    distancia = us.value()/10
+    while(distancia < 82):
+        Andar_frente()
+        distancia = us.value()/10
+    Parar()
+    Andar_tras()
+    sleep(1)
+    Subir_garra()
+    Girar_dir_90()
+    Girar_dir_90()
+    Descer_garra()
+    while (distancia < 82):
+        Andar_frente()
+        distancia = us.value() / 10
+    Parar()
