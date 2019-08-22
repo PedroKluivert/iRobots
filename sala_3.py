@@ -81,16 +81,6 @@ def Motor_Infinito_frente(x):
         if us.value() / 10 < 12: #distancia da parede
              Parar()
 
-
-
-def Motor_Infinito_tras():
-    while us.value() / 10 > 15:
-        motor_dir.run_forever(speed_sp=-500)
-        motor_esq.run_forever(speed_sp=-500)
-        if us.value() / 10 < 10:
-            Parar()
-
-
 # Função para parar
 def Parar():
     motor_esq.stop()
@@ -142,16 +132,6 @@ def Girar_esq_90():
         Giro_Total = Ang_ant - gy.value()
     Parar()
 
-def Andar_frente(x):
-    dist = us.value()/10
-    while dist>=x:
-        print(dist)
-        motor_esq.run_forever(speed_sp=500)
-        motor_dir.run_forever(speed_sp=500)
-        if dist<x:
-            motor_esq.stop()
-            motor_dir.stop()
-
 def Percorrer():
     volta = 0
     for i in range(4):
@@ -167,57 +147,64 @@ def Percorrer():
                 Motor_Andar(2, -400, 400)
                 Motor_Andar(5, -400, -400)
             else:
-                Motor_Andar(6, 400, 0)
+                Motor_Andar(5.5, 400, 0)
                 volta = 1
+                Motor_Andar(2, -400, -400)
         elif(volta == 1):
             if i ==3:
                 Parar()
                 Motor_Andar(2, -400, 400)
                 Motor_Andar(5, -400, -400)
             else:
-                Motor_Andar(6, 0, 400)
+                Motor_Andar(5.5, 0, 400)
                 volta = 0
-        Motor_Andar(2, -400, -400)
+                Motor_Andar(2, -400, -400)
 
     Parar()
-    Parar_garra()
+    DerrubarVitimas()
+
 
 def VerAreaDeResgate():
-    Subir_garra()
-    dist = us.value() / 10
     Motor_Infinito_frente(12)
     Motor_Andar(2.2, 400, -100)  # girar eixo 90
     sleep(1)
 
-CONSTANTE = True
-while CONSTANTE:
-    try:
-         dist2 = us2.value() / 10
-         print(dist2, ' cm')
-         VerAreaDeResgate()
-         if (dist2 >= 18.5):
-             Parar()
-             Sound.beep()
-             print('Vi a area de resgate!')
-             Percorrer()
-             break
-         else:
-             pid = PID(250, 0, 0, setpoint=4.6)
-
-    except KeyboardInterrupt:
+def DerrubarVitimas():
+    Descer_garra()
+    for i in range(5):
+        Motor_Andar(3, -1000, -1000)
         Parar()
-        Parar_garra()
-        CONSTANTE = False
+        Motor_Andar(1.5, 300, 300)
+        Parar()
+    Parar_garra()
 
+def ProcuraInicial():
+    Subir_garra()
+    CONSTANTE = True
+    while CONSTANTE:
+        try:
+            dist2 = us2.value() / 10
+            print(dist2, ' cm')
+            VerAreaDeResgate()
+            if (dist2 >= 18.5) and (dist2 <= 30):
+                Parar()
+                Sound.beep()
+                print('Vi a area de resgate!')
+                Percorrer()
+                break
+            elif(dist2 > 30):
+                print('vi bolinha\n', dist2)
+                Motor_Andar(2, -400, 400)
+                VerAreaDeResgate()
+            else:
+                pid = PID(250, 0, 0, setpoint=4.6)
+
+        except KeyboardInterrupt:
+            Parar()
+            Parar_garra()
+            CONSTANTE = False
+
+ProcuraInicial()
 print('\nVoces vao conseguir!')
 
-# for i in range(3):
-#     motor_esq.run_forever(speed_sp=-1000)
-#     motor_dir.run_forever(speed_sp=-1000)
-#     Parar()
-#     motor_esq.run_forever(speed_sp=300)
-#     motor_dir.run_forever(speed_sp=300)
-#     sleep(1)
-#     Parar()
-# Parar_garra()
 
