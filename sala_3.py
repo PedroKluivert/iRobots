@@ -12,13 +12,13 @@ from simple_pid import PID
 us = UltrasonicSensor('in1')
 us.mode = 'US-DIST-CM'
 motor_esq = LargeMotor('outB')
-motor_dir = LargeMotor('outC')
+motor_dir = LargeMotor('outA')
 motor_med = MediumMotor('outD')
 us2 = UltrasonicSensor('in3')
 us2.mode = 'US-DIST-CM'
 
 #kp = 178 kd=0.8 ki=0.50 valor default
-pid = PID(150, 0, 0, setpoint=4)
+pid = PID(250, 0, 0, setpoint=4.8)
 
 # cl = ColorSensor('in3')
 # cl.mode = 'COL-COLOR'
@@ -65,15 +65,15 @@ def Motor_Infinito_frente(x):
     #control = pid(us.value())
     #print(control)
 
-    while us.value() / 10 > x:
+    while (us.value() / 10 > x):
 
         control = pid(us2.value()/10)
-        if control > 500:
+        if (control > 500):
             control = 500
-        elif control < -500:
+        elif (control < -500):
             control = -500
 
-        print(control + 500, 500 - control)
+        # print(control + 500, 500 - control)
 
         motor_dir.run_forever(speed_sp=500 + control)
         motor_esq.run_forever(speed_sp=500 - control)
@@ -142,6 +142,16 @@ def Girar_esq_90():
         Giro_Total = Ang_ant - gy.value()
     Parar()
 
+def Andar_frente(x):
+    dist = us.value()/10
+    while dist>=x:
+        print(dist)
+        motor_esq.run_forever(speed_sp=500)
+        motor_dir.run_forever(speed_sp=500)
+        if dist<x:
+            motor_esq.stop()
+            motor_dir.stop()
+
 def Percorrer():
     volta = 0
     for i in range(4):
@@ -154,48 +164,51 @@ def Percorrer():
         if(volta == 0):
             if i ==3:
                 Parar()
-            Motor_Andar(6, 400, 0)
-            volta = 1
+                Motor_Andar(2, -400, 400)
+                Motor_Andar(5, -400, -400)
+            else:
+                Motor_Andar(6, 400, 0)
+                volta = 1
         elif(volta == 1):
             if i ==3:
                 Parar()
-            Motor_Andar(6, 0, 400)
-            volta = 0
+                Motor_Andar(2, -400, 400)
+                Motor_Andar(5, -400, -400)
+            else:
+                Motor_Andar(6, 0, 400)
+                volta = 0
         Motor_Andar(2, -400, -400)
+
+    Parar()
+    Parar_garra()
+
+def VerAreaDeResgate():
+    Subir_garra()
+    dist = us.value() / 10
+    Motor_Infinito_frente(12)
+    Motor_Andar(2.2, 400, -100)  # girar eixo 90
+    sleep(1)
 
 CONSTANTE = True
 while CONSTANTE:
     try:
-         Subir_garra()
-         dist = us.value()/10
-         Motor_Infinito_frente(12)
-         # Motor_Andar(1.5, 400, -400) #girar eixo 90
-         Motor_Andar(2.77, 400, 0)  # girar eixo 90
-         sleep(0.1)
-         # Motor_Andar(0.5, 600)       #andar para frente para analisar se é mesmo a área de resgate
-         sleep(1)
          dist2 = us2.value() / 10
          print(dist2, ' cm')
-         if(dist2 > 20):
-            Parar()
-            Sound.beep()
-            print('Vi a area de resgate!')
-            Percorrer()
-            break
+         VerAreaDeResgate()
+         if (dist2 >= 18.5):
+             Parar()
+             Sound.beep()
+             print('Vi a area de resgate!')
+             Percorrer()
+             break
          else:
-            Subir_garra()
-            dist = us.value() / 10
-            Motor_Infinito_frente(18)
-            Motor_Andar(1.3, -200, -200)  # ré
-            Motor_Andar(1.4, 400, -400)
-            sleep(0.1)
-            Motor_Andar(1, 600)
-
+             pid = PID(250, 0, 0, setpoint=4.6)
 
     except KeyboardInterrupt:
         Parar()
         Parar_garra()
         CONSTANTE = False
+
 print('\nVoces vao conseguir!')
 
 # for i in range(3):
