@@ -86,10 +86,10 @@ def AndarpelaDistancia(dir=500, esq=450):
                 Motor_Andar(4.3, 400, 0)
                 volta = 1
             else:
-                if (i == 3):
+                if i==3:
                     Parar()
-                    sleep(0.5)
-                    Motor_Andar(2.5, -400, 400)
+                    Descer_garra()
+                    Motor_Andar(1.5, -400, 400)
                     Motor_Andar(4, -400, -400)
                 else:
                     Motor_Andar(4.1, 0, 400)
@@ -176,7 +176,7 @@ def Seguir_Linha():
         if cont == 5:
             print('entrei na sala')
             Parar()
-            break
+            ProcuraInicial()
 
         print(control + velocidade, velocidade - control)
 
@@ -244,7 +244,6 @@ def Pecorrer():
             Motor_Andar(1, -350, -410)
             Motor_Andar(0.5, 200, 260)
             Motor_Andar(1.6, 400, -100)
-        DerrubarVitimas2()
 
     except KeyboardInterrupt:
         Parar()
@@ -263,15 +262,12 @@ def DerrubarVitimas():
     Descer_garra()
     for i in range(3):
         Parar()
-        Motor_Andar(2, -500, -500)
+        Motor_Andar(2, -600, -600)
         Parar()
         Motor_Andar(1.5, 300, 350)
         Parar()
     Parar_garra()
 
-def DerrubarVitimas2():
-    Motor_Andar(1.6, 400, -100)
-    DerrubarVitimas()
 
 # O robo vai procurar a area de resgate
 def ProcuraInicial():
@@ -308,15 +304,17 @@ def ProcuraInicial():
             Parar_garra()
             CONSTANTE = False
 
-try:
-    Seguir_Linha()
-    ProcuraInicial()
-    Pecorrer()
-except KeyboardInterrupt:
-    Parar()
-    Parar_garra()
+
+#ProcuraInicial()
+
+#Pecorrer()
+
+Subir_garra()
+sleep(2)
+Descer_garra()
 
 # Falar
 #Sound.speak("HHUULLKK").wait()
+
+print('\nVoces vao conseguir!')
 # on_message()
-print("FIM")

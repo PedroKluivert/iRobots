@@ -16,7 +16,7 @@ client.on_publish = on_publish
 
 client.connect("localhost", 1883, 60)
 
-ultrasonic = ev3.UltrasonicSensor("in1")
+#ultrasonic = ev3.UltrasonicSensor("in1")
 #color_sensor = ev3.ColorSensor("in2")
 
 
@@ -25,7 +25,7 @@ client.loop_start()
 
 try:
     while True:
-        message = pack("iid", ultrasonic.value(), 0, time.time())
+        message = pack("iid", 0, 0, time.time())
         client.publish("topic/sensors", message, qos=0)
         print(unpack("iid", message))
         time.sleep(0.1)
