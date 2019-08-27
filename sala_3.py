@@ -89,7 +89,7 @@ def AndarpelaDistancia(dir=500, esq=450):
                 if (i == 3):
                     Parar()
                     sleep(0.5)
-                    Motor_Andar(1.3, -400, 400)
+                    Motor_Andar(1.27, -400, 400)
                     Motor_Andar(4, -400, -400)
                 else:
                     Motor_Andar(4.1, 0, 400)
@@ -133,23 +133,6 @@ def Motor_Infinito_frente(x):
 
         if UltraSonico_1.value() / 10 < 12: #distancia da parede
              Parar()
-
-
-#Tentando contornar Obstáculo
-def Obstáculo():
-    if UltraSonico_1.value() / 10 <= 6:
-        return True
-    else:
-        return False
-
-
-def Contornar():
-    if Obstáculo() == True:
-        Motor_Andar(2, 400, -400)
-        Motor_Andar(1, 400, 400)
-        for i in range(2):
-            Motor_Andar(2, -400, 400 )
-            Motor_Andar(1, 400, 400)
 
 
 def Seguir_Linha():
@@ -282,14 +265,6 @@ def ProcuraInicial():
             dist2 = UltrasonicoLado.value() / 10
             print(dist2, ' cm')
             VerAreaDeResgate()
-            # if (dist2 > 50):
-            #     print("Entrei pelo lado esquerdo!")
-            #     Motor_Andar(1.5, 200, -200)
-            #     Parar()
-            #     sleep(2)
-            #     Motor_Andar(1, 200, 200)
-            #     #ProcuraInicial()
-            # dist2 = UltrasonicoLado.value() / 10
             if (dist2 >= 18.5) and (dist2 <= 30):
                 Parar()
                 Sound.beep()
@@ -298,7 +273,8 @@ def ProcuraInicial():
                 break
             elif(dist2 > 30):
                 print('vi bolinha\n', dist2)
-                Motor_Andar(2, -400, 400)
+                Motor_Andar(1.6, 100, -400)
+                Motor_Andar(1.6, -100, 400)
                 VerAreaDeResgate()
             else:
                 pid = PID(250, 0, 0, setpoint=4.6)
