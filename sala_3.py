@@ -89,7 +89,7 @@ def AndarpelaDistancia(dir=500, esq=450):
                 if (i == 3):
                     Parar()
                     sleep(0.5)
-                    Motor_Andar(2.5, -400, 400)
+                    Motor_Andar(1.3, -400, 400)
                     Motor_Andar(4, -400, -400)
                 else:
                     Motor_Andar(4.1, 0, 400)
@@ -263,7 +263,7 @@ def DerrubarVitimas():
     Descer_garra()
     for i in range(3):
         Parar()
-        Motor_Andar(2, -500, -500)
+        Motor_Andar(2, -400, -400)
         Parar()
         Motor_Andar(1.5, 300, 350)
         Parar()
